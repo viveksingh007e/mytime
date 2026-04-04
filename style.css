@@ -122,12 +122,16 @@ body {
     justify-content: center;
     gap: 0;
     margin-bottom: 0;
+    max-width: 100%;
+    overflow: visible;
+    transform-origin: center;
+    scale: 0.85;
 }
 
 .input-row input {
-    width: 2em;
+    width: 1.5em;
     font-family: inherit;
-    font-size: clamp(4rem, 20vw, 36rem);
+    font-size: clamp(5.5rem, 28vw, 50rem);
     font-weight: 700;
     text-align: center;
     color: var(--accent);
@@ -136,6 +140,7 @@ body {
     padding: 0;
     outline: none;
     line-height: 1;
+    caret-color: transparent;
 }
 
 .input-row input:focus {
@@ -143,7 +148,7 @@ body {
 }
 
 .input-row .colon {
-    font-size: clamp(4rem, 20vw, 36rem);
+    font-size: clamp(5.5rem, 28vw, 50rem);
     font-weight: 700;
     line-height: 1;
 }

@@ -201,6 +201,12 @@ window.addEventListener("load", () => {
             if (e.key === "Enter") {
                 e.preventDefault();
                 startCountdown();
+            } else if (e.key === "t" || e.key === "T") {
+                e.preventDefault();
+                switchTab("time");
+            } else if (e.key === "f" || e.key === "F") {
+                e.preventDefault();
+                toggleFullscreen();
             }
         });
     });
