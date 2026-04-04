@@ -185,10 +185,14 @@ window.addEventListener("load", () => {
     });
 
     document.addEventListener("keydown", (e) => {
+        if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
         if (e.key === " " && (countdownInterval || alarmAudio)) {
-            if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
             e.preventDefault();
             stopCountdown();
+        } else if (e.key === "c" || e.key === "C") {
+            switchTab("countdown");
+        } else if (e.key === "t" || e.key === "T") {
+            switchTab("time");
         }
     });
 
