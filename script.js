@@ -102,6 +102,9 @@ function stopCountdown() {
     stopAlarm();
     document.getElementById("countdown-running").classList.add("hidden");
     document.getElementById("countdown-setup").classList.remove("hidden");
+    document.getElementById("cd-minutes").value = "";
+    document.getElementById("cd-seconds").value = "";
+    document.getElementById("cd-minutes").focus();
 }
 
 function resetCountdown() {
@@ -189,7 +192,7 @@ window.addEventListener("load", () => {
         if (e.key === " " && (countdownInterval || alarmAudio)) {
             e.preventDefault();
             stopCountdown();
-        } else if (e.key === "c" || e.key === "C") {
+        } else if (e.key === "t" || e.key === "T") {
             switchTab("countdown");
         } else if (e.key === "t" || e.key === "T") {
             switchTab("time");
