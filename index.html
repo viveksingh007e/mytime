@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Clock</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="wrapper">
+        <nav class="tab-bar">
+            <button class="tab-btn active" data-tab="time">Time</button>
+            <button class="tab-btn" data-tab="countdown">Countdown</button>
+        </nav>
+
+        <main class="clock-shell" aria-live="polite">
+            <div class="view-stack">
+                <section id="time-view" class="view-layer active-view">
+                    <div id="clock">00:00</div>
+                    <div id="meta">Friday, January 1</div>
+                </section>
+
+                <section id="countdown-view" class="view-layer">
+                    <div id="countdown-setup">
+                        <div class="input-row">
+                            <input type="number" id="cd-minutes" min="0" max="99" placeholder="MM" aria-label="Minutes">
+                            <span class="colon">:</span>
+                            <input type="number" id="cd-seconds" min="0" max="59" placeholder="SS" aria-label="Seconds">
+                        </div>
+                    </div>
+                    <div id="countdown-running" class="hidden">
+                        <div id="cd-display">00:00</div>
+                        <div id="cd-status"></div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
