@@ -1,7 +1,18 @@
 let wakeLock = null;
 let countdownInterval = null;
 let countdownRemaining = 0;
+let countdownInitial = 0;
+let countdownLastMinutes = "";
+let countdownLastSeconds = "";
 let alarmAudio = null;
+const countdownRunCountKey = "mytime-countdown-runs";
+let countdownRunCount = 0;
+
+function clearStoredRunCount() {
+    try {
+        localStorage.removeItem(countdownRunCountKey);
+    } catch (_) { }
+}
 
 // --- Clock ---
 
@@ -70,12 +81,22 @@ function updateCountdownDisplay() {
     document.getElementById("cd-display").textContent = formatCountdown(countdownRemaining);
 }
 
+function updateRunCounter() {
+    document.getElementById("run-counter-value").textContent = String(countdownRunCount);
+}
+
 function startCountdown() {
     const minutes = parseInt(document.getElementById("cd-minutes").value) || 0;
     const seconds = parseInt(document.getElementById("cd-seconds").value) || 0;
     const totalSeconds = minutes * 60 + seconds;
     if (totalSeconds <= 0) return;
 
+    countdownRunCount++;
+    updateRunCounter();
+
+    countdownLastMinutes = String(minutes);
+    countdownLastSeconds = String(seconds);
+    countdownInitial = totalSeconds;
     countdownRemaining = totalSeconds;
 
     document.getElementById("countdown-setup").classList.add("hidden");
@@ -90,20 +111,37 @@ function startCountdown() {
         if (countdownRemaining <= 0) {
             clearInterval(countdownInterval);
             countdownInterval = null;
+            countdownRemaining = countdownInitial;
+            updateCountdownDisplay();
             document.getElementById("cd-status").textContent = "The timer is up!";
             playAlarm();
         }
     }, 1000);
 }
 
-function stopCountdown() {
+function restoreLastCountdownInputs() {
+    document.getElementById("cd-minutes").value = countdownLastMinutes;
+    document.getElementById("cd-seconds").value = countdownLastSeconds;
+}
+
+function clearCountdownInputs() {
+    document.getElementById("cd-minutes").value = "";
+    document.getElementById("cd-seconds").value = "";
+    countdownLastMinutes = "";
+    countdownLastSeconds = "";
+}
+
+function stopCountdown(preserveLastInterval = false) {
     clearInterval(countdownInterval);
     countdownInterval = null;
     stopAlarm();
     document.getElementById("countdown-running").classList.add("hidden");
     document.getElementById("countdown-setup").classList.remove("hidden");
-    document.getElementById("cd-minutes").value = "";
-    document.getElementById("cd-seconds").value = "";
+    if (preserveLastInterval) {
+        restoreLastCountdownInputs();
+    } else {
+        clearCountdownInputs();
+    }
     document.getElementById("cd-minutes").focus();
 }
 
@@ -113,8 +151,7 @@ function resetCountdown() {
     stopAlarm();
     document.getElementById("countdown-running").classList.add("hidden");
     document.getElementById("countdown-setup").classList.remove("hidden");
-    document.getElementById("cd-minutes").value = "";
-    document.getElementById("cd-seconds").value = "";
+    clearCountdownInputs();
 }
 
 // --- Tabs ---
@@ -126,6 +163,7 @@ function switchTab(tab) {
     document.querySelectorAll(".view-layer").forEach(layer => {
         layer.classList.toggle("active-view", layer.id === tab + "-view");
     });
+    document.getElementById("run-counter").classList.toggle("hidden", tab !== "countdown");
 
     if (tab === "time") {
         resetCountdown();
@@ -170,7 +208,10 @@ function handleFullscreenHotkey(e) {
 window.addEventListener("load", () => {
     const clockEl = document.getElementById("clock");
     const shell = document.querySelector(".clock-shell");
+    clearStoredRunCount();
+    countdownRunCount = 0;
     updateClock();
+    updateRunCounter();
 
     // Lock shell height to Time view's size
     requestAnimationFrame(() => {
@@ -191,7 +232,7 @@ window.addEventListener("load", () => {
         if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
         if (e.key === " " && (countdownInterval || alarmAudio)) {
             e.preventDefault();
-            stopCountdown();
+            stopCountdown(true);
         } else if (e.key === "t" || e.key === "T") {
             switchTab("countdown");
         } else if (e.key === "t" || e.key === "T") {
