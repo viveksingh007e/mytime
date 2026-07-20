@@ -1,50 +1,314 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time and Timer</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏳</text></svg>" type="image/svg+xml">
-    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23050505' stroke='%2393c5fd' stroke-width='4'/%3E%3Cline x1='32' y1='32' x2='32' y2='16' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3Cline x1='32' y1='32' x2='44' y2='38' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='32' r='3' fill='white'/%3E%3C/svg%3E">
+    <title>SamaY</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            cursor: none;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .clock::before {
+            content: '';
+            position: absolute;
+            inset: 15px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .clock {
+            position: relative;
+            width: 750px;
+            height: 750px;
+            border-radius: 50%;
+
+            background: #050505;
+
+            border: 4px solid rgba(255, 255, 255, 0.15);
+
+            box-shadow:
+                0 0 30px rgba(255, 255, 255, 0.08),
+                0 0 100px rgba(0, 150, 255, 0.15);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .clock::before {
+            content: '';
+            position: absolute;
+            inset: 25px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .number {
+            position: absolute;
+            color: white;
+            font-size: 4.1rem;
+            font-weight: 600;
+            --scale: 1;
+            transition: transform 220ms ease, text-shadow 220ms ease, color 220ms ease;
+
+            text-shadow:
+                0 0 10px rgba(255, 255, 255, .4);
+
+            transform:
+                rotate(calc(30deg * var(--n))) translateY(-330px) rotate(calc(-30deg * var(--n))) scale(var(--scale));
+        }
+
+        .number.active {
+            --scale: 2;
+            color: #dbeafe;
+            text-shadow:
+                0 0 12px rgba(255, 255, 255, 0.9),
+                0 0 24px rgba(96, 165, 250, 0.95),
+                0 0 42px rgba(96, 165, 250, 0.85);
+        }
+
+        .center {
+            position: absolute;
+
+            width: 30px;
+            height: 30px;
+
+            border-radius: 50%;
+
+            background: black;
+
+            box-shadow:
+                0 0 10px #fff,
+                0 0 20px #fff,
+                0 0 40px #60a5fa,
+                0 0 70px #60a5fa;
+
+            z-index: 100;
+        }
+
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom;
+            transform: translateX(-50%);
+            border-radius: 20px;
+        }
+
+        .hour {
+            width: 14px;
+            height: 220px;
+            background: white;
+            box-shadow: 0 0 10px rgba(255, 255, 255, .5);
+        }
+
+        .minute {
+            width: 8px;
+            height: 260px;
+            background: #93c5fd;
+            box-shadow: 0 0 12px #60a5fa;
+        }
+
+        .second {
+            width: 3px;
+            height: 290px;
+
+            background: linear-gradient(to top,
+                    #ff1744,
+                    #ff5252,
+                    white);
+
+            box-shadow:
+                0 0 15px #ff1744,
+                0 0 30px #ff1744;
+        }
+
+        .tick {
+            position: absolute;
+            width: 4px;
+            height: 18px;
+            background: rgba(255, 255, 255, 0.5);
+            top: 10px;
+            left: 50%;
+            transform-origin: 50% 240px;
+        }
+
+        .digital {
+            margin-top: 30px;
+            color: white;
+        }
+
+        .time {
+            font-size: 2.4rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .date {
+            margin-top: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+
+        @media(max-width:600px) {
+            .clock {
+                width: 340px;
+                height: 340px;
+            }
+
+            .number {
+                transform:
+                    rotate(calc(30deg * var(--n))) translateY(-140px) rotate(calc(-30deg * var(--n))) scale(var(--scale));
+                font-size: 1.2rem;
+            }
+
+            .hour {
+                height: 80px;
+            }
+
+            .minute {
+                height: 115px;
+            }
+
+            .second {
+                height: 130px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-    <div id="run-counter" class="hidden" aria-live="polite" aria-label="Timer run count">
-        <!-- <span class="run-counter-label">Runs</span> -->
-        <span id="run-counter-value">0</span>
+    <div class="container">
+
+        <div class="clock">
+
+            <div class="hour hand" id="hour"></div>
+            <div class="minute hand" id="minute"></div>
+            <div class="second hand" id="second"></div>
+            <div class="center"></div>
+
+            <div class="number" style="--n:1">1</div>
+            <div class="number" style="--n:2">2</div>
+            <div class="number" style="--n:3">3</div>
+            <div class="number" style="--n:4">4</div>
+            <div class="number" style="--n:5">5</div>
+            <div class="number" style="--n:6">6</div>
+            <div class="number" style="--n:7">7</div>
+            <div class="number" style="--n:8">8</div>
+            <div class="number" style="--n:9">9</div>
+            <div class="number" style="--n:10">10</div>
+            <div class="number" style="--n:11">11</div>
+            <div class="number" style="--n:12">12</div>
+
+        </div>
+
+        <div class="digital">
+            <div class="time" id="digitalTime"></div>
+            <div class="date" id="date"></div>
+        </div>
+
     </div>
 
-    <div class="wrapper">
-        <nav class="tab-bar">
-            <button class="tab-btn active" data-tab="time">Time</button>
-            <button class="tab-btn" data-tab="countdown">Countdown</button>
-        </nav>
+    <script>
+        const hourHand = document.getElementById("hour");
+        const minuteHand = document.getElementById("minute");
+        const secondHand = document.getElementById("second");
+        const numberEls = [...document.querySelectorAll(".number")];
 
-        <main class="clock-shell" aria-live="polite">
-            <div class="view-stack">
-                <section id="time-view" class="view-layer active-view">
-                    <div id="clock">00:00</div>
-                    <div id="meta">Friday, January 1</div>
-                </section>
+        const numbersByLabel = numberEls.reduce((acc, el) => {
+            acc[el.textContent.trim()] = el;
+            return acc;
+        }, {});
 
-                <section id="countdown-view" class="view-layer">
-                    <div id="countdown-setup">
-                        <div class="input-row">
-                            <input type="number" id="cd-minutes" min="0" max="99" placeholder="M" aria-label="Minutes">
-                            <span class="colon">:</span>
-                            <input type="number" id="cd-seconds" min="0" max="59" placeholder="S" aria-label="Seconds">
-                        </div>
-                    </div>
-                    <div id="countdown-running" class="hidden">
-                        <div id="cd-display">00:00</div>
-                        <div id="cd-status"></div>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
+        function syncHandVisibilityWithActiveNumbers() {
+            const hasActiveNumber = numberEls.some((el) => el.classList.contains("active"));
+            hourHand.style.display = hasActiveNumber ? "none" : "block";
+            minuteHand.style.display = hasActiveNumber ? "none" : "block";
+        }
 
-    <script src="script.js"></script>
+        function setExclusiveActiveNumber(target) {
+            const isAlreadyActive = target.classList.contains("active");
+
+            if (isAlreadyActive) {
+                numberEls.forEach((el) => {
+                    el.classList.remove("active");
+                    el.style.visibility = "visible";
+                });
+                syncHandVisibilityWithActiveNumbers();
+                return;
+            }
+
+            numberEls.forEach((el) => {
+                const shouldActivate = el === target;
+                el.classList.toggle("active", shouldActivate);
+                el.style.visibility = shouldActivate ? "visible" : "hidden";
+            });
+
+            syncHandVisibilityWithActiveNumbers();
+        }
+
+        document.addEventListener("keydown", (e) => {
+
+            if (e.repeat) return;
+
+            if (/^[0-9]$/.test(e.key)) {
+                const label = e.key === "0" ? "12" : e.key;
+                const target = numbersByLabel[label];
+                if (target) {
+                    setExclusiveActiveNumber(target);
+                }
+            }
+
+        });
+
+        function updateClock() {
+
+            const now = new Date();
+
+            const ms = now.getMilliseconds();
+            const sec = now.getSeconds() + ms / 1000;
+            const min = now.getMinutes() + sec / 60;
+            const hr = (now.getHours() % 12) + min / 60;
+
+            hourHand.style.transform =
+                `translateX(-50%) rotate(${hr * 30}deg)`;
+
+            minuteHand.style.transform =
+                `translateX(-50%) rotate(${min * 6}deg)`;
+
+            secondHand.style.transform =
+                `translateX(-50%) rotate(${sec * 6}deg)`;
+
+            requestAnimationFrame(updateClock);
+        }
+
+        updateClock();
+    </script>
 
 </body>
+
 </html>
